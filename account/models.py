@@ -28,7 +28,7 @@ class Major(models.Model):
 
 class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True, null=True, blank=True)
-    is_student=models.BooleanField(default=False, verbose_name="دانش آموز")
+    is_student = models.BooleanField(default=False, verbose_name="دانش آموز")
     is_teacher = models.BooleanField(default=False, verbose_name="معلم")
     email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
     national_code = models.CharField(max_length=10, blank=True, validators=[national_code_validator], verbose_name="کد ملی")
@@ -46,6 +46,8 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     def __str__(self):
+        if self.get_full_name() == None:
+            return self.get_username()
         return self.get_full_name()
 
     def get_full_name(self):
