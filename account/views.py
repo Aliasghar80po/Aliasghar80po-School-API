@@ -9,25 +9,27 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import (
     RegisterApiSerializer,
+    TeacherRegisterApiSerializer,
     CustomAuthTokenSerializer,
     CustomTokenObtainPairSerializer,
     PasswordChangeSerializer,
     ActivationResendApiSerializer,
 )
+from .permissions import IsAdminOrStudent, IsSuperUser, IsAdminOrTeacher
 
 User = get_user_model()
 
 
 class RegisterApiView(GenericAPIView):
     serializer_class = RegisterApiSerializer
-
+    permission_classes = [IsAdminOrStudent]
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -49,6 +51,32 @@ class RegisterApiView(GenericAPIView):
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
 
+
+class TeacherRegisterApiView(GenericAPIView):
+    serializer_class = TeacherRegisterApiSerializer
+    permission_classes = [IsAdminUser, IsAdminOrTeacher]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            self.send_activation_email(user)
+            return Response(data={"email": user.email}, status=status.HTTP_201_CREATED)
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def send_activation_email(self, user):
+        token = self.get_token_for_user(user)
+        email_object = EmailMessage(
+            template_name="send_email/activation_email.html",
+            context={"token": token},
+            from_email="admin@gmail.com",
+            to=[user.email],
+        )
+        email_object.send()
+
+    def get_token_for_user(self, user):
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
 
 class ActivationConfirmApiView(APIView):
     def get(self, request, token):
@@ -98,7 +126,11 @@ class ActivationResendApiView(GenericAPIView):
 
     def get_token_for_user(self, user):
         refresh = RefreshToken.for_user(user)
-        return str(refresh.access_token)
+        # return str(refresh.access_token)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
 
 
 class CustomObtainAuthToken(ObtainAuthToken):

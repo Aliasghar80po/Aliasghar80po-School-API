@@ -12,7 +12,7 @@ class RegisterApiSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["email", "password", "password2"]
+        fields = ["email", "password", "password2", "first_name", "last_name", "national_code"]
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:
@@ -26,6 +26,37 @@ class RegisterApiSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop("password2")
         return User.objects.create_user(**validated_data)
+
+
+class TeacherRegisterApiSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(max_length=200, write_only=True)
+    school_name = serializers.CharField(required=False)
+    biography = serializers.CharField(required=False)
+
+    class Meta:
+        model = User
+        fields = ["username", "password", "password2", "first_name", "last_name", "national_code", "school_name", "biography"]
+
+    def validate(self, attrs):
+        if attrs["password"] != attrs["password2"]:
+            raise serializers.ValidationError({"detail": "Passwords must match"})
+        try:
+            validate_password(attrs.get("password"))
+        except exceptions.ValidationError as e:
+            raise serializers.ValidationError({"password": list(e.messages)})
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        validated_data.pop("password2")
+        school_name = validated_data.pop("school_name", None)
+        biography = validated_data.pop("biography", None)
+        user = User.objects.create_user(**validated_data)
+        if school_name:
+            user.teacherprofile.school_name = school_name
+        if biography:
+            user.teacherprofile.biography = biography
+        user.teacherprofile.save()
+        return user
 
 
 class ActivationResendApiSerializer(serializers.Serializer):

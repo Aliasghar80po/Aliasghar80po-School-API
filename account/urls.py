@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("register/", views.RegisterApiView.as_view(), name="register"),
+    path("register/teacher/", views.TeacherRegisterApiView.as_view(), name="register_teacher"),
     path(
         "activation/confirm/<str:token>/",
         views.ActivationConfirmApiView.as_view(),
