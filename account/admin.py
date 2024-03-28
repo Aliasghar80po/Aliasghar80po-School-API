@@ -55,40 +55,44 @@ class UserAdmin(BaseUserAdmin):
     add_form = UserCreationForm
 
     # Add your new fields here to the 'fieldsets' tuple
-    fieldsets = BaseUserAdmin.fieldsets + (
-        ("اطلاعات عمومی", {
-            "fields": ("national_code", "profile_picture", "address", "father_name", "grade", "major")
-        }),
-    )
+    # fieldsets = (
+    #     *BaseUserAdmin.fieldsets,
+    #     (None, {"fields": ("national_code", "profile_picture", "address", "father_name", "grade")}),
+    #     ("اطلاعات عمومی", {"fields": ("data_of_birth", "major")}),
+    # )
 
     # Extend list_display with your new fields
-    list_display = BaseUserAdmin.list_display + ("is_student", "is_teacher", "grade", "major", "father_name")
+    # list_display = (*BaseUserAdmin.list_display, "is_student", "is_teacher", "grade", "major", "father_name")
 
     # Extend list_filter with your new fields
-    list_filter = BaseUserAdmin.list_filter = ("is_active", "is_superuser", "groups", "last_login", "date_joined", "is_teacher", "is_student", "major", "grade")
+    # list_filter = (*BaseUserAdmin.list_filter, "is_teacher", "is_student", "data_of_birth", "major", "grade")
 
     # Extend search_fields with your new fields
-    search_fields = BaseUserAdmin.search_fields + ("national_code", "father_name")
+    # search_fields = (*BaseUserAdmin.search_fields, "national_code", "father_name")
 
     # Extend add_fieldsets with your new fields
-    add_fieldsets = BaseUserAdmin.add_fieldsets + (
+    add_fieldsets = (
+        *BaseUserAdmin.add_fieldsets,
         (None, {
             "classes": ["wide"],
             "fields": ["is_student", "is_teacher", "national_code", "profile_picture", "address", "father_name", "grade", "major"]
         }),
     )
 
-# Register your models and admin classes here
 
+UserAdmin.fieldsets[2][1]["fields"] += ("is_teacher", "is_student")
+UserAdmin.fieldsets += ("اطلاعات عمومی", {"fields": ("national_code", "profile_picture", "address", "father_name", "grade", "major")}),
+UserAdmin.list_display += ("is_student", "is_teacher", "grade", "major", "father_name")
+UserAdmin.list_filter += ("is_teacher", "is_student", "is_staff")
+UserAdmin.search_fields += ("national_code", "father_name")
 
 admin.site.register(User, UserAdmin)
+
+
+# Register your models and admin classes here
+
 admin.site.register(Grade)
 admin.site.register(Major)
 
 # Unregister the Group model from admin since we're not using Django's built-in permissions
 admin.site.unregister(Group)
-
-
-
-
-

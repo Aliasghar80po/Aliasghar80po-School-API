@@ -30,6 +30,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True, null=True, blank=True)
     is_student = models.BooleanField(default=False, verbose_name="دانش آموز")
     is_teacher = models.BooleanField(default=False, verbose_name="معلم")
+    # is_staff = models.BooleanField(default=False)
     email = models.EmailField(verbose_name="email address", max_length=255, unique=True)
     national_code = models.CharField(max_length=10, blank=True, validators=[national_code_validator], verbose_name="کد ملی")
     profile_picture = models.ImageField(upload_to="account/", verbose_name="عکس پروفایل", blank=True)

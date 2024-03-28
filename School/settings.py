@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'exercise.apps.ExerciseConfig',
     'new.apps.NewConfig',
     'rest_framework_simplejwt',
-    'drf_spectacular'
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
