@@ -24,12 +24,14 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("account/", include("account.urls")),
-    # login with rest-framework
-    path("api-login/", include("rest_framework.urls")),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    # YOUR PATTERNS
+    path("api/user/", include("account.urls")),
+    path("exercise/", include("exercise.urls")),
+    path("news/", include("new.urls")),
+    # # login with rest-framework
+    # path("api-login/", include("rest_framework.urls")),
+    # path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # # YOUR PATTERNS
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

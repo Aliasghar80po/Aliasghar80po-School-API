@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Exercise
+from .models import Exercise, ExerciseResponse
 
 
 class ExerciseAdmin(admin.ModelAdmin):
@@ -10,3 +10,10 @@ class ExerciseAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Exercise, ExerciseAdmin)
+
+
+class ExerciseResponseAdmin(admin.ModelAdmin):
+    list_display = ("exercise", "created_by", "response_date")
+
+
+admin.site.register(ExerciseResponse, ExerciseResponseAdmin)
